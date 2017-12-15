@@ -21,7 +21,7 @@ vector<size_t> generate_random_slots(pair<size_t,size_t> range, const distributi
     vector<size_t> vslots;
 
     random_generator * gen = make_generator(distrib);
-    
+
     for (size_t node = range.first; node <= range.second; node++) {
         size_t nb_slots = gen->next();
         if (distrib.type == DISTRIBUTION::ZIPFIAN) {
@@ -45,13 +45,18 @@ void abstract_graph_writer::add_random_edges(config::edge & c_edge) {
     }
 }
 
+double abstract_graph_writer::approximate_zipfian(size_t nb_nodes) {
+    size_t max_approx_value = 100000;
+    return nb_nodes > max_approx_value ? max_approx_value : nb_nodes;
+}
+
 void abstract_graph_writer::add_random_edges1(config::edge & c_edge) {
     auto subject_node_range = node_ranges_per_type[c_edge.subject_type];
     auto object_node_range = node_ranges_per_type[c_edge.object_type];
     size_t nb_objects = 1 + object_node_range.second - object_node_range.first;
     
     if(c_edge.outgoing_distrib.type == DISTRIBUTION::ZIPFIAN && c_edge.outgoing_distrib.arg1 == 0) {
-        c_edge.outgoing_distrib.arg1 = nb_objects;
+        c_edge.outgoing_distrib.arg1 = approximate_zipfian(nb_objects);
     }
     
     random_generator * gen = make_generator(c_edge.outgoing_distrib);
@@ -78,21 +83,22 @@ void abstract_graph_writer::add_random_edges2(config::edge & c_edge) {
     auto object_node_range = node_ranges_per_type[c_edge.object_type];
     size_t nb_subjects = 1 + subject_node_range.second - subject_node_range.first;
     size_t nb_objects = 1 + object_node_range.second - object_node_range.first;
-    
+
     if(c_edge.outgoing_distrib.type == DISTRIBUTION::ZIPFIAN && c_edge.outgoing_distrib.arg1 == 0) {
-        c_edge.outgoing_distrib.arg1 = nb_objects;
+        c_edge.outgoing_distrib.arg1 = approximate_zipfian(nb_objects);
     }
 
     if(c_edge.incoming_distrib.type == DISTRIBUTION::ZIPFIAN && c_edge.incoming_distrib.arg1 == 0) {
-        c_edge.incoming_distrib.arg1 = nb_subjects;
+        c_edge.incoming_distrib.arg1 = approximate_zipfian(nb_subjects);
     }
-    
-    
+
+
     vector<size_t> subject_slots = generate_random_slots(node_ranges_per_type[c_edge.subject_type], c_edge.outgoing_distrib);
     vector<size_t> object_slots = generate_random_slots(node_ranges_per_type[c_edge.object_type], c_edge.incoming_distrib);
     size_t n = subject_slots.size();
     size_t m = object_slots.size();
     
+    std::srand(chrono::system_clock::now().time_since_epoch().count());
     if (n < m) {
         random_shuffle(object_slots.begin(), object_slots.end());
     } else {
@@ -133,13 +139,13 @@ void abstract_graph_writer::build_graph (config::config & conf, report::report &
 
     created_edges.clear();
     created_edges.resize(conf.predicates.size());
-    
+
     cout << "creating edges" << endl;
     for (config::edge & edge : conf.schema.edges) {
         cout << "add random edges: " << edge.subject_type << " " << edge.predicate << " " << edge.object_type << " " << edge.multiplicity << " " << edge.outgoing_distrib << " " << edge.incoming_distrib <<endl;
         add_random_edges(edge);
     }
-    
+
     for (size_t predicate = 0; predicate < conf.predicates.size(); predicate++) {
         if(created_edges[predicate] < conf.predicates[predicate].size[graphNumber]) {
             int nb_edges = conf.predicates[predicate].size[graphNumber] - created_edges[predicate];

@@ -32,6 +32,7 @@ private:
     //unordered_map<size_t, unordered_map<size_t, unordered_set<size_t>>> neighbors;
     void add_random_edges1(config::edge & c_edge);
     void add_random_edges2(config::edge & c_edge);
+    double approximate_zipfian(size_t nb_objects);
     void add_remaining_edges(size_t predicate, size_t nb_edges);
 
 protected:

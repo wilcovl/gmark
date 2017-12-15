@@ -38,7 +38,7 @@ void processingEdgeTypes::processEdgeType(config::edge & edgeType, bool printNod
 	incrementalDeterministicGraphGenerator graphGenerator = incrementalDeterministicGraphGenerator();
 
 	// For all different graph sizes
-	for (int j=0; j<conf.nb_graphs; j++) {
+	for (size_t j=0; j<conf.nb_graphs; j++) {
 		// Define the output file
 		ofstream outputFile;
 		outputFile.open(graphFile + to_string(j) + ".txt", ios::app);

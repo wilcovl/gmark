@@ -71,7 +71,7 @@ vector<int> incrementalDeterministicGraphGenerator::sortOnDegree(vector<int> sub
 	}
 
 	vector<int> indegreeDistr;
-	for (int i=0; i<subjectsIterationIds.size(); i++) {
+	for (size_t i=0; i<subjectsIterationIds.size(); i++) {
 		indegreeDistr.push_back(0);
 	}
 //	cout << "indegreeDistr size: " << indegreeDistr.size();

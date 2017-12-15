@@ -257,7 +257,6 @@ int main(int argc, char ** argv) {
 		processETs.sequentialProcessing(printNodeProperties, graph_file);
     } else {
 		for (size_t i=0; i<conf.nb_graphs; i++) {
-	//	  	cout << "Processing graph " << i << endl;
 			report::report rep;
 			ofstream graph_stream;
 
